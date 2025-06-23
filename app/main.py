@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from app.parsing.parse import extract_text_from_pdf, extract_text_from_docx
+from app.LLM.prompt import format_parsed_text_to_json
 
 app = FastAPI()
 
@@ -20,10 +21,14 @@ async def upload_file(file: UploadFile = File(...)):
             parsed_text = extract_text_from_pdf(file_content)
         elif file.filename.lower().endswith(".docx"):
             parsed_text = extract_text_from_docx(file_content)
+        
+        structured_claim = format_parsed_text_to_json(parsed_text)
+
         return {
             "file_name": file.filename, 
             "file_size": len(file_content),
-            "parsed_text": parsed_text
+            "parsed_text": parsed_text,
+            "structured_claim": structured_claim
             }
 
     except Exception as e:
