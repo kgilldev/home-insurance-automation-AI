@@ -25,5 +25,4 @@ def format_parsed_text_to_json(raw_text: str) -> dict:
     output = response.json()
     json_text = output.get("response", "").strip()
 
-    print("Mistral Output: ", json_text)
     return json.loads(json_text)
