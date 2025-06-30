@@ -1,8 +1,9 @@
 import requests
 import json
 from app.LLM.rules import validation_rules
+from app.schema.claims import StructuredClaim
 
-def format_parsed_text_to_json(raw_text: str) -> dict:
+def format_parsed_text_to_json(raw_text: str) -> StructuredClaim:
     mistral = "http://localhost:11434/api/generate"
     prompt = f"""
     Please fix all typos and ensure that all fields are populated with 100% certainty.
@@ -11,12 +12,12 @@ def format_parsed_text_to_json(raw_text: str) -> dict:
     Use the following rules to help make your decision: {validation_rules}
 
     Extract the following fields from the raw_text you received:
-    1. Claimant Name
-    2. Claimant Date (in MM-DD-YYYY format)
-    3. Claim Summary (Keep the summary to 1-3 sentences)
-    4. Claim Amount (return as a float for a USD amount)
-    5. Claim Decision (Accept, Reject, Escalate)
-    6. Decision Reasoning (1-3 sentences on how you made your decision, use the validation_rules to support your argument)
+    1. claimant_name
+    2. claimant_date (in MM-DD-YYYY format)
+    3. claim_summary (Keep the summary to 1-3 sentences)
+    4. claim_amount (return as a float for a USD amount)
+    5. claim_decision (Accept, Reject, Escalate)
+    6. decision_reasoning (1-3 sentences on how you made your decision, use the validation_rules to support your argument)
 
     Text:
     {raw_text}
@@ -34,6 +35,8 @@ def format_parsed_text_to_json(raw_text: str) -> dict:
         raise ValueError("json_text is empty")
 
     try:
-        return json.loads(json_text)
+        parsed = json.loads(json_text)
+        structured_claim = StructuredClaim(**parsed)
+        return structured_claim
     except Exception as e:
         raise ValueError(f"JSON can not be parsed: {e}")
