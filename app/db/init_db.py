@@ -1,4 +1,4 @@
-from app.db.database import engine
+from app.db.database import sync_engine
 from app.db.models import Base
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=sync_engine)
