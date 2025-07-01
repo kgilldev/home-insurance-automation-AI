@@ -1,6 +1,7 @@
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, JSON, DateTime
+from sqlalchemy import Column, Integer, String, JSON, DateTime, TIMESTAMP
 import datetime
+
 
 Base = declarative_base()
 
@@ -12,6 +13,6 @@ class Claims(Base):
     parsed_text = Column(String, nullable=False)
     structured_claim = Column(JSON, nullable=False)
     decision = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
-    updated_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc))
+    updated_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.datetime.now(datetime.timezone.utc), onupdate=datetime.datetime.now(datetime.timezone.utc))
 
