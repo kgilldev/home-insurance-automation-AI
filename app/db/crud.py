@@ -1,8 +1,9 @@
 from sqlalchemy.exc import SQLAlchemyError
 from app.db.database import AsyncSessionLocal
-from app.db.schema import Claims 
+from app.db.schema import Claims
+from app.enum.enums import DecisionStatus 
 
-async def write_to_db(file_name:str, parsed_text:str, structured_claim:dict, decision:str):
+async def write_to_db(file_name:str, parsed_text:str, structured_claim:dict, decision:DecisionStatus):
     async with AsyncSessionLocal() as session:
         try:
             claim = Claims(
