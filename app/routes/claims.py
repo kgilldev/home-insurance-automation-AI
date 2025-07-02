@@ -1,4 +1,5 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
 from app.db.database import AsyncSessionLocal
 from app.db.schema import Claims
@@ -45,4 +46,21 @@ async def get_all_claims():
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(Claims))
         claims = result.scalars().all()
+
+        if not claims:
+            raise HTTPException(404, f"No claims found in claims table") 
         return claims
+
+@router.get("/claims/{claim_id}")
+async def get_claim(claim_id: int):
+    async with AsyncSessionLocal() as session:
+        try:
+            result = await session.execute(select(Claims).where(Claims.id == claim_id))
+            claim = result.scalar_one_or_none()
+            
+            if not claim:
+                raise HTTPException(404, f"Claim with {claim_id} NOT FOUND")
+            return claim
+
+        except SQLAlchemyError as e:
+            raise HTTPException(500, f"Error retrieving claim with claim_id: {claim_id} {e}")
