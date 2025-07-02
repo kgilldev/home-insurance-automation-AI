@@ -1,7 +1,7 @@
 import requests
 import json
 from app.LLM.rules import validation_rules
-from app.schema.claims import StructuredClaim
+from app.pydantic.model import StructuredClaim
 
 def format_parsed_text_to_json(raw_text: str) -> StructuredClaim:
     mistral = "http://localhost:11434/api/generate"

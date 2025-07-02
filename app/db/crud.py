@@ -1,7 +1,6 @@
-from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from app.db.database import AsyncSessionLocal
-from app.db.models import Claims 
+from app.db.schema import Claims 
 
 async def write_to_db(file_name:str, parsed_text:str, structured_claim:dict, decision:str):
     async with AsyncSessionLocal() as session:
