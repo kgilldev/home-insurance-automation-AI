@@ -1,6 +1,8 @@
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, JSON, TIMESTAMP
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column
+from sqlalchemy import JSON, TIMESTAMP, Enum
 from datetime import datetime, timezone
+
+from app.enum.enums import DecisionStatus
 
 
 Base = declarative_base()
@@ -8,11 +10,10 @@ Base = declarative_base()
 class Claims(Base):
     __tablename__ = "claims"
 
-    id = Column(Integer, primary_key=True)
-    file_name = Column(String, nullable=False)
-    parsed_text = Column(String, nullable=False)
-    structured_claim = Column(JSON, nullable=False)
-    decision = Column(String, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    file_name:Mapped[str] = mapped_column(nullable=False)
+    parsed_text:Mapped[str] = mapped_column(nullable=False)
+    structured_claim:Mapped[dict] = mapped_column(JSON, nullable=False)
+    decision:Mapped[DecisionStatus] = mapped_column(Enum(DecisionStatus), nullable=False)
+    created_at:Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
