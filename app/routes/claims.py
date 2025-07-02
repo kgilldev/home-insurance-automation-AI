@@ -64,3 +64,17 @@ async def get_claim(claim_id: int):
 
         except SQLAlchemyError as e:
             raise HTTPException(500, f"Error retrieving claim with claim_id: {claim_id} {e}")
+
+@router.delete("/claims/{claim_id}")
+async def delete_claim(claim_id: int):
+    async with AsyncSessionLocal() as session:
+        try:
+            result = await session.execute(select(Claims).where(Claims.id == claim_id))
+            claim = result.scalar_one_or_none()
+
+            if not claim:
+                raise HTTPException(404, f"Claim with {claim_id} NOT FOUND")
+            return claim
+            
+        except SQLAlchemyError as e:
+            raise HTTPException(500, f"Error deleting claim with claim_id: {claim_id} {e}")
