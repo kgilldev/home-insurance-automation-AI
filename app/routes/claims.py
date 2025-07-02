@@ -1,4 +1,7 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
+from sqlalchemy.future import select
+from app.db.database import AsyncSessionLocal
+from app.db.schema import Claims
 from app.parsing.parse import extract_text_from_docx, extract_text_from_pdf
 from app.LLM.prompt import format_parsed_text_to_json
 from app.db.crud import write_to_db
@@ -36,3 +39,10 @@ async def upload_file(file: UploadFile = File(...)):
     
     finally:
         await file.close()
+
+@router.get("/claims")
+async def get_all_claims():
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Claims))
+        claims = result.scalars().all()
+        return claims
