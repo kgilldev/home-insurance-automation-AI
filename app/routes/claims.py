@@ -5,8 +5,8 @@ from app.db.database import AsyncSessionLocal
 from app.db.schema import Claims
 from app.parsing.parse import extract_text_from_docx, extract_text_from_pdf
 from app.LLM.prompt import format_parsed_text_to_json
-from app.db.crud import write_to_db
-from app.pydantic.model import UpdateStructuredClaim
+from app.db.crud import create_claim
+from app.pydantic.model import ClaimResponse, StructuredClaim, UpdateStructuredClaim
 
 router = APIRouter()
 
@@ -14,7 +14,7 @@ router = APIRouter()
 async def upload_file(file: UploadFile = File(...)):
 
     if not file.filename or not file.filename.lower().endswith((".pdf", ".docx")):
-        raise HTTPException(status_code=400, detail=f"File type not supported {file.filename}, must be a PDF or DOCX")
+        raise HTTPException(400, detail=f"File type not supported {file.filename}, must be a PDF or DOCX")
     
     try:
         file_content = await file.read()
@@ -25,19 +25,27 @@ async def upload_file(file: UploadFile = File(...)):
             parsed_text = extract_text_from_docx(file_content)
         
         structured_claim = format_parsed_text_to_json(parsed_text)
-
         decision = structured_claim.claim_decision
-        await write_to_db(file.filename, parsed_text, structured_claim.model_dump(), decision)
 
-        return {
-            "file_name": file.filename, 
-            "structured_claim": structured_claim,
-            "decision": structured_claim.claim_decision,
-            "reason": structured_claim.decision_reasoning,
-            }
+        async with AsyncSessionLocal() as session:
+            try:
+                claim = await create_claim(
+                    session, file.filename, parsed_text, structured_claim.model_dump(), decision)
+                await session.commit()
+                await session.refresh(claim)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading file: {file.filename} {e}")
+                return ClaimResponse(
+                    file_name= claim.file_name, 
+                    structured_claim= StructuredClaim(**claim.structured_claim), 
+                    decision= claim.decision, 
+                    decision_reasoning= claim.structured_claim["decision_reasoning"])
+
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise HTTPException(500, detail=f"Unable to write claim into DB: {claim}-{e}")
+
+    except RuntimeError as e:
+        raise HTTPException(500, detail=f"Error reading file: {file.filename} {e}")
     
     finally:
         await file.close()

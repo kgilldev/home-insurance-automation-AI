@@ -16,7 +16,7 @@ def format_parsed_text_to_json(raw_text: str) -> StructuredClaim:
     2. claimant_date (in MM-DD-YYYY format)
     3. claim_summary (Keep the summary to 1-3 sentences)
     4. claim_amount (return as a float for a USD amount)
-    5. claim_decision (ACCEPTED, REJECTED, ESCALATED)
+    5. claim_decision (ACCEPT, REJECT, ESCALATED)
     6. decision_reasoning (1-3 sentences on how you made your decision, use the validation_rules to support your argument)
 
     Text:

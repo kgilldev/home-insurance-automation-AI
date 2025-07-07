@@ -13,3 +13,9 @@ class StructuredClaim(BaseModel):
 class UpdateStructuredClaim(BaseModel):
     decision: DecisionStatus
     decision_reasoning: str
+
+class ClaimResponse(BaseModel):
+    file_name: str
+    structured_claim: StructuredClaim
+    decision: DecisionStatus
+    decision_reasoning: str
