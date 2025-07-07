@@ -1,6 +1,4 @@
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import and_
-from app.db.database import AsyncSessionLocal
 from sqlalchemy.future import select
 from app.db.schema import Claims
 from app.enum.enums import DecisionStatus
