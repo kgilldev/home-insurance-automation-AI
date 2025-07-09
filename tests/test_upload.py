@@ -12,16 +12,16 @@ client = TestClient(app)
 PREFIX = Path(__file__).resolve().parent / "files"
 
 class FakeClaim:
-        file_name = "sample.pdf"
-        structured_claim = {
-            "claimant_name": "McLovin",
-            "claimant_date": "09-09-2025",
-            "claim_summary": "fire but no pants on fire",
-            "claim_amount": 2100.00,
-            "claim_decision": "ACCEPT",
-            "decision_reasoning": "claim accepted by the Gods"
-        }
-        decision = "ACCEPT"
+    file_name = "sample.pdf"
+    structured_claim = {
+        "claimant_name": "McLovin",
+        "claimant_date": "09-09-2025",
+        "claim_summary": "fire but no pants on fire",
+        "claim_amount": 2100.00,
+        "claim_decision": DecisionStatus.ACCEPT,
+        "decision_reasoning": "claim accepted by the Gods"
+    }
+    decision = DecisionStatus.ACCEPT
 
 @patch("app.routes.claims.AsyncSessionLocal")
 @patch("app.routes.claims.create_claim", new_callable=AsyncMock)
